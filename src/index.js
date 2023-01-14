@@ -3,6 +3,7 @@ const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
 const Filter = require("bad-words");
+const { generateMessageandTimestamp } = require("./utils/messages");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,14 +17,17 @@ app.use(express.static(publicDirectories));
 io.on("connection", (socket) => {
   console.log("websocket connection made to the server");
 
-  socket.emit("message", "Welcome!!!");
-  socket.broadcast.emit("message", "new user has joined the chat");
+  socket.emit("message", generateMessageandTimestamp("welcome"));
+  socket.broadcast.emit(
+    "message",
+    generateMessageandTimestamp("new user has joined the chat")
+  );
   socket.on("newMessage", (newMessage, callBack) => {
     const filter = new Filter();
     if (filter.isProfane(newMessage)) {
       return callBack("Profanity is not allowed");
     }
-    io.emit("message", newMessage);
+    io.emit("message", generateMessageandTimestamp(newMessage));
     callBack();
   });
 
@@ -33,7 +37,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    io.emit("message", "User has disconnected");
+    io.emit("message", generateMessageandTimestamp("User has left the chat"));
   });
 });
 

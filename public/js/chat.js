@@ -4,10 +4,22 @@ const socket = io();
 const $messageForm = document.getElementById("form-m");
 const $messageInput = document.getElementById("message");
 const $messageSubmitButton = document.getElementById("submit");
-
 const $sendLocation = document.getElementById("send-location");
+const $renderMessages = document.getElementById("render-messages");
+const $renderLocation = document.getElementById("render-location");
+
+// Templates from script
+const $messageTemplate = document.getElementById("message-template").innerHTML;
+const $locationTemplate =
+  document.getElementById("location-template").innerHTML;
+
 socket.on("message", (message) => {
   console.log(message);
+  const html = Mustache.render($messageTemplate, {
+    message: message.text,
+    createdAt: moment(message.createdAt).format("h:mm:A"),
+  });
+  $renderMessages.insertAdjacentHTML("beforeend", html);
 });
 
 $messageForm.addEventListener("submit", (e) => {
@@ -48,4 +60,8 @@ $sendLocation.addEventListener("click", () => {
 
 socket.on("location", (location) => {
   console.log(`location: ${location}`);
+  const html = Mustache.render($locationTemplate, {
+    location: location,
+  });
+  $renderLocation.insertAdjacentHTML("beforeend", html);
 });
