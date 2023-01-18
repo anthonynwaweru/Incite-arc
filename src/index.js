@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
   // user sending location
   socket.on("sendLocation", ({ lat, lon }, callBack) => {
     const { user } = getUser(socket.id);
-    console.log(user[0].username);
+
     io.to(user[0].room).emit(
       "location",
       generateLocationMessage(
@@ -85,7 +85,6 @@ io.on("connection", (socket) => {
   // user disconnect
   socket.on("disconnect", () => {
     const user = removeUser(socket.id);
-    console.log(user);
 
     if (user) {
       io.to(user.room).emit(
